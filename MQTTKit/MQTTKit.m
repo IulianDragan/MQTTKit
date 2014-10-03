@@ -9,10 +9,11 @@
 
 #import "MQTTKit.h"
 #import "mosquitto.h"
+#import <CocoaLumberjack/CocoaLumberjack.h>
 
-#if 0 // set to 1 to enable logs
+#if 1 // set to 1 to enable logs
 
-#define LogDebug(frmt, ...) NSLog(frmt, ##__VA_ARGS__);
+#define LogDebug(frmt, ...) DDLogInfo(frmt, ##__VA_ARGS__);
 
 #else
 
@@ -72,11 +73,17 @@
 
 @end
 
+static const int ddLogLevel = LOG_LEVEL_VERBOSE;
+
 @implementation MQTTClient
 
-
-
 #pragma mark - mosquitto callback methods
+
+static void on_log(struct mosquitto *mosq, void *obj, int level, const char *str)
+{
+    MQTTClient* client = (__bridge MQTTClient*)obj;
+    LogDebug(@"[%@] on_log = %s", client.clientID, str);
+}
 
 static void on_connect(struct mosquitto *mosq, void *obj, int rc)
 {
@@ -204,6 +211,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_message_callback_set(mosq, on_message);
         mosquitto_subscribe_callback_set(mosq, on_subscribe);
         mosquitto_unsubscribe_callback_set(mosq, on_unsubscribe);
+        mosquitto_log_callback_set(mosq, on_log);
 
         self.queue = dispatch_queue_create(cstrClientId, NULL);
     }
