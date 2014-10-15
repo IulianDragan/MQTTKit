@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
 
   s.source_files  = 'libmosquitto/*.{h,c}', 'MQTTKit/*.{h,m}'
   s.public_header_files = 'MQTTKit/MQTTKit.h'
-  
   s.requires_arc = true
 
   s.dependency 'CocoaLumberjack'
