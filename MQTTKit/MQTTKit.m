@@ -100,9 +100,11 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
 {
     MQTTClient* client = (__bridge MQTTClient*)obj;
     LogDebug(@"[%@] on_disconnect rc = %d", client.clientID, rc);
-    [client.publishHandlers removeAllObjects];
-    [client.subscriptionHandlers removeAllObjects];
-    [client.unsubscriptionHandlers removeAllObjects];
+    if (rc == 0) {
+        [client.publishHandlers removeAllObjects];
+        [client.subscriptionHandlers removeAllObjects];
+        [client.unsubscriptionHandlers removeAllObjects];
+    }
 
     client.connected = NO;
     if (client.disconnectionHandler) {
@@ -114,9 +116,9 @@ static void on_publish(struct mosquitto *mosq, void *obj, int message_id)
 {
     MQTTClient* client = (__bridge MQTTClient*)obj;
     NSNumber *mid = [NSNumber numberWithInt:message_id];
-    void (^handler)(int) = [client.publishHandlers objectForKey:mid];
+    void (^handler)(int, NSError *) = [client.publishHandlers objectForKey:mid];
     if (handler) {
-        handler(message_id);
+        handler(message_id, nil);
         if (message_id > 0) {
             [client.publishHandlers removeObjectForKey:mid];
         }
@@ -306,16 +308,18 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
             toTopic:(NSString *)topic
             withQos:(MQTTQualityOfService)qos
              retain:(BOOL)retain
-  completionHandler:(void (^)(int mid))completionHandler {
+  completionHandler:(void (^)(int mid, NSError *error))completionHandler {
     const char* cstrTopic = [topic cStringUsingEncoding:NSUTF8StringEncoding];
     if (qos == 0 && completionHandler) {
         [self.publishHandlers setObject:completionHandler forKey:[NSNumber numberWithInt:0]];
     }
     int mid;
-    mosquitto_publish(mosq, &mid, cstrTopic, payload.length, payload.bytes, qos, retain);
+    int errorCode = mosquitto_publish(mosq, &mid, cstrTopic, payload.length, payload.bytes, qos, retain);
+//    BOOL success = (errorCode == MOSQ_ERR_SUCCESS || errorCode == MOSQ_ERR_CONN_PENDING);
+//    NSError *error = success ? nil : [NSError new];
     if (completionHandler) {
         if (qos == 0) {
-            completionHandler(mid);
+            completionHandler(mid, nil);
         } else {
             [self.publishHandlers setObject:completionHandler forKey:[NSNumber numberWithInt:mid]];
         }
@@ -326,7 +330,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
               toTopic:(NSString *)topic
               withQos:(MQTTQualityOfService)qos
                retain:(BOOL)retain
-    completionHandler:(void (^)(int mid))completionHandler; {
+    completionHandler:(void (^)(int mid, NSError *error))completionHandler; {
     [self publishData:[payload dataUsingEncoding:NSUTF8StringEncoding]
               toTopic:topic
               withQos:qos

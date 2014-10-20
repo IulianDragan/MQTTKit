@@ -92,12 +92,12 @@ typedef void (^MQTTDisconnectionHandler)(NSUInteger code);
             toTopic:(NSString *)topic
             withQos:(MQTTQualityOfService)qos
              retain:(BOOL)retain
-  completionHandler:(void (^)(int mid))completionHandler;
+  completionHandler:(void (^)(int mid, NSError *error))completionHandler;
 - (void)publishString:(NSString *)payload
               toTopic:(NSString *)topic
               withQos:(MQTTQualityOfService)qos
                retain:(BOOL)retain
-    completionHandler:(void (^)(int mid))completionHandler;
+    completionHandler:(void (^)(int mid, NSError *error))completionHandler;
 
 #pragma mark - Subscribe
 
