@@ -9,18 +9,6 @@
 
 #import "MQTTKit.h"
 #import "mosquitto.h"
-#import <CocoaLumberjack/CocoaLumberjack.h>
-
-#if 1 // set to 1 to enable logs
-
-#define LogDebug(frmt, ...) NSLog(frmt, ##__VA_ARGS__);
-//#define LogDebug(frmt, ...) DDLogInfo(frmt, ##__VA_ARGS__);
-
-#else
-
-#define LogDebug(frmt, ...) {}
-
-#endif
 
 #pragma mark - MQTT Message
 
@@ -74,8 +62,6 @@
 
 @end
 
-static const int ddLogLevel = LOG_LEVEL_VERBOSE;
-
 @implementation MQTTClient
 
 #pragma mark - mosquitto callback methods
@@ -83,13 +69,17 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
 static void on_log(struct mosquitto *mosq, void *obj, int level, const char *str)
 {
     MQTTClient* client = (__bridge MQTTClient*)obj;
-    LogDebug(@"[%@] on_log = %s", client.clientID, str);
+    if (client.logHandler) {
+        client.logHandler([NSString stringWithFormat:@"[%@] on_log = %s", client.clientID, str]);
+    }
 }
 
 static void on_connect(struct mosquitto *mosq, void *obj, int rc)
 {
     MQTTClient* client = (__bridge MQTTClient*)obj;
-    LogDebug(@"[%@] on_connect rc = %d", client.clientID, rc);
+    if (client.logHandler) {
+        client.logHandler([NSString stringWithFormat:@"[%@] on_connect rc = %d", client.clientID, rc]);
+    }
     client.connected = (rc == ConnectionAccepted);
     if (client.connectionCompletionHandler) {
         client.connectionCompletionHandler(rc);
@@ -99,7 +89,9 @@ static void on_connect(struct mosquitto *mosq, void *obj, int rc)
 static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
 {
     MQTTClient* client = (__bridge MQTTClient*)obj;
-    LogDebug(@"[%@] on_disconnect rc = %d", client.clientID, rc);
+    if (client.logHandler) {
+        client.logHandler([NSString stringWithFormat:@"[%@] on_disconnect rc = %d", client.clientID, rc]);
+    }
     if (rc == 0) {
         [client.publishHandlers removeAllObjects];
         [client.subscriptionHandlers removeAllObjects];
@@ -139,7 +131,9 @@ static void on_message(struct mosquitto *mosq, void *obj, const struct mosquitto
                                                            retain:mosq_msg->retain
                                                               mid:mosq_msg->mid];
         MQTTClient* client = (__bridge MQTTClient*)obj;
-        LogDebug(@"[%@] on message %@", client.clientID, message);
+        if (client.logHandler) {
+            client.logHandler([NSString stringWithFormat:@"[%@] on message %@", client.clientID, message]);
+        }
         if (client.messageHandler) {
             client.messageHandler(message);
         }
@@ -254,9 +248,13 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
     mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
     
     dispatch_async(self.queue, ^{
-        LogDebug(@"start mosquitto loop on %@", self.queue);
+        if (self.logHandler) {
+            self.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", self.queue]);
+        }
         mosquitto_loop_forever(mosq, -1, 1);
-        LogDebug(@"end mosquitto loop on %@", self.queue);
+        if (self.logHandler) {
+            self.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", self.queue]);
+        }
     });
 }
 

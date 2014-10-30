@@ -60,6 +60,7 @@ typedef void (^MQTTDisconnectionHandler)(NSUInteger code);
 @property (readonly, assign) BOOL connected;
 @property (nonatomic, copy) MQTTMessageHandler messageHandler;
 @property (nonatomic, copy) MQTTDisconnectionHandler disconnectionHandler;
+@property (nonatomic, copy) void (^logHandler)(NSString *logMessage);
 
 + (void) initialize;
 + (NSString*) version;
