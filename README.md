@@ -1,5 +1,5 @@
 # MQTTKit
-a
+
 [![Build Status](https://travis-ci.org/mobile-web-messaging/MQTTKit.svg?branch=master)](https://travis-ci.org/mobile-web-messaging/MQTTKit)
 
 MQTTKit is a modern event-driven Objective-C library for [MQTT 3.1][mqtt].
