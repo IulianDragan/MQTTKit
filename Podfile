@@ -1,3 +1,3 @@
-platform :ios, '5.1.1'
+platform :ios, '7.0'
 
-pod 'OpenSSL-Universal', '~> 1.0'
+pod 'OpenSSL-Universal', '~> 1.0.1.j-2'
