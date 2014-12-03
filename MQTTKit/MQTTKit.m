@@ -225,45 +225,14 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
     mosquitto_username_pw_set(mosq, cstrUsername, cstrPassword);
     mosquitto_reconnect_delay_set(mosq, self.reconnectDelay, self.reconnectDelayMax, self.reconnectExponentialBackoff);
     
+    const char *caFile = [self.caFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *certFile = [self.certFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *keyFile = [self.keyFilePath cStringUsingEncoding:NSUTF8StringEncoding];
     
-    
-    
-    NSLog(@"self.cafile: %@", self.cafile);
-    
-    
-    
-
-    NSString *certfile = [[NSBundle mainBundle] pathForResource:@"movile" ofType:@"crt"];
-//    NSLog(@"certfile: %@", certfile);
-
-    NSString *keyfile = [[NSBundle mainBundle] pathForResource:@"movile" ofType:@"key"];
-//    NSLog(@"keyfile: %@", keyfile);
-
-
-    
-    
-    
-    
-    
-    
-//    certfile
-//    movile.crt
-//    Arquivo assinado pelo servidor
-    
-//    keyfile
-//    movile.plain.key
-//    Arquivo privado
-    
-    
-    
-//    int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *capath, const char *certfile, const char *keyfile, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
-    
-    if (self.cafile && mosquitto_tls_set(mosq, [self.cafile cStringUsingEncoding:NSUTF8StringEncoding], NULL, [certfile cStringUsingEncoding:NSUTF8StringEncoding], [keyfile cStringUsingEncoding:NSUTF8StringEncoding], NULL)) {
-        NSLog(@"error setting up TLS");
-    } else {
-        NSLog(@"#GoMovile!");
+    if (self.caFilePath) {
+        mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, NULL);
     }
-
+    
     mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
     
     dispatch_async(queue, ^{
