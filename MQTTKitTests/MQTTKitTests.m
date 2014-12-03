@@ -12,15 +12,20 @@
 #define secondsToNanoseconds(t) (t * 1000000000ull) // in nanoseconds
 #define gotSignal(semaphore, timeout) ((dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, secondsToNanoseconds(timeout)))) == 0l)
 
+#define kTimeoutForSuccess 30
+#define kTimeoutForFailure 30
+
 #define M2M 1
 
 #if M2M
 
 #define kHost @"m2m.eclipse.org"
+#define kPort 1883
 
 #else
 
 #define kHost @"localhost"
+#define kPort 1883
 
 #endif
 
@@ -41,6 +46,7 @@ NSString *topic;
     client.username = @"user";
     client.password = @"password";
     client.host = kHost;
+    client.port = kPort;
     
     topic = [NSString stringWithFormat:@"MQTTKitTests/%@", [[NSUUID UUID] UUIDString]];
 }
@@ -93,9 +99,8 @@ NSString *topic;
         }
     }];
 
-    XCTAssertFalse(gotSignal(connectError, 4));
-    
     XCTAssertFalse(client.connected);
+    XCTAssertFalse(gotSignal(connectError, kTimeoutForFailure));
 }
 
 - (void)testConnectDisconnect
@@ -112,8 +117,8 @@ NSString *topic;
         }
     }];
 
-    XCTAssertTrue(gotSignal(connected, 4));
     XCTAssertTrue(client.connected);
+    XCTAssertTrue(gotSignal(connected, kTimeoutForSuccess));
 
     dispatch_semaphore_t disconnected = dispatch_semaphore_create(0);
 
@@ -121,11 +126,11 @@ NSString *topic;
         dispatch_semaphore_signal(disconnected);
     }];
 
-    XCTAssertTrue(gotSignal(disconnected, 4));
     XCTAssertFalse(client.connected);
+    XCTAssertTrue(gotSignal(disconnected, kTimeoutForSuccess));
 }
 
-- (void)testPublish
+- (void)publishWithClient:(MQTTClient *)client
 {
     dispatch_semaphore_t subscribed = dispatch_semaphore_create(0);
 
@@ -140,7 +145,7 @@ NSString *topic;
         }];
     }];
 
-    XCTAssertTrue(gotSignal(subscribed, 4));
+    XCTAssertTrue(gotSignal(subscribed, kTimeoutForSuccess));
 
     NSString *text = [NSString stringWithFormat:@"Hello, MQTT %d", arc4random()];
 
@@ -158,13 +163,18 @@ NSString *topic;
                    retain:YES
         completionHandler:^(int mid) {
             dispatch_semaphore_signal(published);
-    }];
+        }];
 
-    XCTAssertTrue(gotSignal(published, 4));
+    XCTAssertTrue(gotSignal(published, kTimeoutForSuccess));
 
-    XCTAssertTrue(gotSignal(received, 4));
+    XCTAssertTrue(gotSignal(received, kTimeoutForSuccess));
 
     [client disconnectWithCompletionHandler:nil];
+}
+
+- (void)testPublish
+{
+    [self publishWithClient:client];
 }
 
 - (void)testPublishMany
@@ -179,7 +189,7 @@ NSString *topic;
         }];
     }];
     
-    XCTAssertTrue(gotSignal(subscribed, 4));
+    XCTAssertTrue(gotSignal(subscribed, kTimeoutForSuccess));
     
     NSString *text = [NSString stringWithFormat:@"Hello, MQTT %d", arc4random()];
     
@@ -206,8 +216,8 @@ NSString *topic;
         }
     }];
     
-    XCTAssertTrue(gotSignal(received, 6));
-    
+    XCTAssertTrue(gotSignal(received, kTimeoutForSuccess));
+
     [client disconnectWithCompletionHandler:nil];
 }
 
@@ -255,6 +265,24 @@ NSString *topic;
     [publisher disconnectWithCompletionHandler:nil];
     [subscriber disconnectWithCompletionHandler:nil];
 }
+/*
+ * use test.mosquitto.org to check TLS support
+ *
+ * the test will download the CA certificate from the test.mosquitto.org web site
+ */
+- (void)testPublishWithTLS
+{
+    client.host = @"test.mosquitto.org";
+    client.port = 8883;
+
+    NSURL *url = [NSURL URLWithString:@"http://test.mosquitto.org/ssl/mosquitto.org.crt"];
+    NSData *content = [[NSData alloc] initWithContentsOfURL:url];
+    NSString *cafile = @"/tmp/mosquitto.org.crt";
+    [content writeToFile:cafile atomically:YES];
+    client.cafile = cafile;
+
+    [self publishWithClient:client];
+}
 
 - (void)testUnsubscribe
 {
@@ -268,7 +296,7 @@ NSString *topic;
          }];
     }];
 
-    XCTAssertTrue(gotSignal(subscribed, 4));
+    XCTAssertTrue(gotSignal(subscribed, kTimeoutForSuccess));
 
     NSString *text = [NSString stringWithFormat:@"Hello, MQTT %d", arc4random()];
 
@@ -285,7 +313,7 @@ NSString *topic;
         dispatch_semaphore_signal(unsubscribed);
     }];
 
-    XCTAssertTrue(gotSignal(unsubscribed, 4));
+    XCTAssertTrue(gotSignal(unsubscribed, kTimeoutForSuccess));
 
     dispatch_semaphore_t published = dispatch_semaphore_create(0);
 
@@ -297,9 +325,9 @@ NSString *topic;
         dispatch_semaphore_signal(published);
     }];
 
-    XCTAssertTrue(gotSignal(published, 4));
+    XCTAssertTrue(gotSignal(published, kTimeoutForSuccess));
 
-    XCTAssertFalse(gotSignal(received, 2));
+    XCTAssertFalse(gotSignal(received, kTimeoutForFailure));
 
     [client disconnectWithCompletionHandler:nil];
 }

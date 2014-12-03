@@ -244,7 +244,15 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
     // FIXME: check for errors
     mosquitto_username_pw_set(mosq, cstrUsername, cstrPassword);
     mosquitto_reconnect_delay_set(mosq, self.reconnectDelay, self.reconnectDelayMax, self.reconnectExponentialBackoff);
-
+    
+    const char *caFile = [self.caFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *certFile = [self.certFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *keyFile = [self.keyFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    
+    if (self.caFilePath) {
+        mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, NULL);
+    }
+    
     mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
     
     dispatch_async(self.queue, ^{

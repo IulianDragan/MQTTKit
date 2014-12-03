@@ -14,7 +14,11 @@ Pod::Spec.new do |s|
 
   s.source_files  = 'libmosquitto/*.{h,c}', 'MQTTKit/*.{h,m}'
   s.public_header_files = 'MQTTKit/MQTTKit.h'
+
+  s.compiler_flags = '-DWITH_THREADING=1'
+  s.compiler_flags = '-DWITH_TLS=1'
   s.requires_arc = true
 
-  s.dependency 'CocoaLumberjack'
+  s.dependency 'OpenSSL-Universal', '~> 1.0'
+
 end
