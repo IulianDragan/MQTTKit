@@ -209,6 +209,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_subscribe_callback_set(mosq, on_subscribe);
         mosquitto_unsubscribe_callback_set(mosq, on_unsubscribe);
         mosquitto_log_callback_set(mosq, on_log);
+        mosquitto_threaded_set(mosq, true);
 
         self.queue = dispatch_queue_create(cstrClientId, NULL);
     }
