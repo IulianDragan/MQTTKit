@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "MVLMQTTKit"
-  s.version      = "0.2.1"
+  s.version      = "0.3.0"
   s.summary      = "Objective-C client for MQTT 3.1"
   s.homepage     = "http://github.com/guilhermeandrade/MQTTKit"
   s.license      = { :type => 'Apache License, Version 2.0', :file => 'LICENSE' }
@@ -14,8 +14,7 @@ Pod::Spec.new do |s|
 
   s.source_files  = 'libmosquitto/*.{h,c}', 'MQTTKit/*.{h,m}'
   s.public_header_files = 'MQTTKit/MQTTKit.h'
-  s.compiler_flags = '-DWITH_THREADING=1'
-  s.compiler_flags = '-DWITH_TLS=1'
+  s.compiler_flags = '-DWITH_THREADING=1 -DWITH_TLS=1'
   s.requires_arc = true
   
   s.dependency 'OpenSSL-Universal', '1.0.1.j-2'
