@@ -254,7 +254,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, NULL);
     }
     
-    mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
+    mosquitto_connect_async(mosq, cstrHost, self.port, self.keepAlive);
     
     dispatch_async(self.queue, ^{
         if (self.logHandler) {
