@@ -9,6 +9,8 @@
 
 #import "MQTTKit.h"
 #import "mosquitto.h"
+#import "mosquitto_internal.h"
+#import "messages_mosq.h"
 
 #pragma mark - MQTT Message
 
@@ -97,11 +99,24 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
         [client.subscriptionHandlers removeAllObjects];
         [client.unsubscriptionHandlers removeAllObjects];
     }
-
+    
     client.connected = NO;
     if (client.disconnectionHandler) {
         client.disconnectionHandler(rc);
     }
+    
+    
+   	struct mosquitto_message_all *tmp = mosq->out_messages;
+    while (tmp) {
+        NSNumber *mid = @(tmp->msg.mid);
+        void (^handler)(int, NSError *) = [client.publishHandlers objectForKey:mid];
+        if (handler) {
+            NSError *error = [NSError errorWithDomain:NSStringFromClass([MQTTClient class]) code:100 userInfo:nil];
+            handler(tmp->msg.mid, error);
+        }
+        tmp = tmp->next;
+    }
+    _mosquitto_message_cleanup_all(mosq);
 }
 
 static void on_publish(struct mosquitto *mosq, void *obj, int message_id)
@@ -193,14 +208,14 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         self.reconnectDelay = 1;
         self.reconnectDelayMax = 1;
         self.reconnectExponentialBackoff = NO;
-
+        
         self.subscriptionHandlers = [[NSMutableDictionary alloc] init];
         self.unsubscriptionHandlers = [[NSMutableDictionary alloc] init];
         self.publishHandlers = [[NSMutableDictionary alloc] init];
         self.cleanSession = cleanSession;
-
+        
         const char* cstrClientId = [self.clientID cStringUsingEncoding:NSUTF8StringEncoding];
-
+        
         mosq = mosquitto_new(cstrClientId, self.cleanSession, (__bridge void *)(self));
         mosquitto_connect_callback_set(mosq, on_connect);
         mosquitto_disconnect_callback_set(mosq, on_disconnect);
@@ -210,7 +225,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_unsubscribe_callback_set(mosq, on_unsubscribe);
         mosquitto_log_callback_set(mosq, on_log);
         mosquitto_threaded_set(mosq, true);
-
+        
         self.queue = dispatch_queue_create(cstrClientId, NULL);
     }
     return self;
@@ -232,7 +247,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
 
 - (void) connectWithCompletionHandler:(void (^)(MQTTConnectionReturnCode code))completionHandler {
     self.connectionCompletionHandler = completionHandler;
-
+    
     const char *cstrHost = [self.host cStringUsingEncoding:NSASCIIStringEncoding];
     const char *cstrUsername = NULL, *cstrPassword = NULL;
     
@@ -322,11 +337,14 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
     }
     int mid;
     int errorCode = mosquitto_publish(mosq, &mid, cstrTopic, payload.length, payload.bytes, qos, retain);
-//    BOOL success = (errorCode == MOSQ_ERR_SUCCESS || errorCode == MOSQ_ERR_CONN_PENDING);
-//    NSError *error = success ? nil : [NSError new];
+    BOOL success = (errorCode == MOSQ_ERR_SUCCESS || errorCode == MOSQ_ERR_CONN_PENDING);
+    NSError *error = success ? nil : [NSError errorWithDomain:NSStringFromClass([MQTTClient class]) code:100 userInfo:nil];
+    
     if (completionHandler) {
-        if (qos == 0) {
-            completionHandler(mid, nil);
+        if (qos == 0 || error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(error ? 0 : mid, error);
+            });
         } else {
             [self.publishHandlers setObject:completionHandler forKey:[NSNumber numberWithInt:mid]];
         }
