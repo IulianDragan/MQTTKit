@@ -1123,6 +1123,7 @@ int mosquitto_loop_read(struct mosquitto *mosq, int max_packets)
 	pthread_mutex_unlock(&mosq->in_message_mutex);
 
 	if(max_packets < 1) max_packets = 1;
+    if (max_packets > 5) max_packets = 5;
 	/* Queue len here tells us how many messages are awaiting processing and
 	 * have QoS > 0. We should try to deal with that many in this loop in order
 	 * to keep up. */
@@ -1157,6 +1158,7 @@ int mosquitto_loop_write(struct mosquitto *mosq, int max_packets)
 	pthread_mutex_unlock(&mosq->in_message_mutex);
 
 	if(max_packets < 1) max_packets = 1;
+    if (max_packets > 5) max_packets = 5;
 	/* Queue len here tells us how many messages are awaiting processing and
 	 * have QoS > 0. We should try to deal with that many in this loop in order
 	 * to keep up. */

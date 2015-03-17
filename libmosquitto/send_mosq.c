@@ -241,6 +241,10 @@ int _mosquitto_send_simple_command(struct mosquitto *mosq, uint8_t command)
 		_mosquitto_free(packet);
 		return rc;
 	}
+    
+    if (command == PUBREC || command == PUBCOMP || command == PUBACK || command == PUBLISH) {
+        mosq->ping_t = 0;
+    }
 
 	return _mosquitto_packet_queue(mosq, packet);
 }
