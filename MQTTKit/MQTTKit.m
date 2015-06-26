@@ -265,9 +265,11 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
     const char *caFile = [self.caFilePath cStringUsingEncoding:NSUTF8StringEncoding];
     const char *certFile = [self.certFilePath cStringUsingEncoding:NSUTF8StringEncoding];
     const char *keyFile = [self.keyFilePath cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *keyData = self.keyData.bytes;
+    int keylength = (int)self.keyData.length;
     
     if (self.caFilePath) {
-        mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, NULL);
+        mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, keyData, keylength, NULL);
     }
     
     dispatch_async(self.queue, ^{

@@ -994,7 +994,7 @@ libmosq_EXPORT int mosquitto_opts_set(struct mosquitto *mosq, enum mosq_opt_t op
  */
 libmosq_EXPORT int mosquitto_tls_set(struct mosquitto *mosq,
 		const char *cafile, const char *capath,
-		const char *certfile, const char *keyfile,
+		const char *certfile, const char *keyfile, const char *keydata, int keylength,
 		int (*pw_callback)(char *buf, int size, int rwflag, void *userdata));
 
 /*

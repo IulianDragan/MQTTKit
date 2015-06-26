@@ -507,8 +507,16 @@ int _mosquitto_socket_connect(struct mosquitto *mosq, const char *host, uint16_t
 					return MOSQ_ERR_TLS;
 				}
 			}
-			if(mosq->tls_keyfile){
-				ret = SSL_CTX_use_PrivateKey_file(mosq->ssl_ctx, mosq->tls_keyfile, SSL_FILETYPE_PEM);
+			if(mosq->tls_keyfile || mosq->tls_keydata){
+                
+                if (mosq->tls_keydata) {
+                    const unsigned char *pbits = mosq->tls_keydata;
+                    RSA *p_key = d2i_RSAPrivateKey(NULL, &pbits, mosq->tls_keylength);
+                    ret = SSL_CTX_use_RSAPrivateKey(mosq->ssl_ctx, p_key);
+                } else {
+                    ret = SSL_CTX_use_PrivateKey_file(mosq->ssl_ctx, mosq->tls_keyfile, SSL_FILETYPE_PEM);
+                }
+                
 				if(ret != 1){
 #ifdef WITH_BROKER
 					_mosquitto_log_printf(mosq, MOSQ_LOG_ERR, "Error: Unable to load client key file, check bridge_keyfile \"%s\".", mosq->tls_keyfile);

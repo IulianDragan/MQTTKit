@@ -55,6 +55,7 @@ typedef void (^MQTTDisconnectionHandler)(NSUInteger code);
 @property (readwrite, copy) NSString *caFilePath;
 @property (readwrite, copy) NSString *certFilePath;
 @property (readwrite, copy) NSString *keyFilePath;
+@property (readwrite, copy) NSData *keyData;
 @property (readwrite, assign) unsigned short keepAlive;
 @property (readwrite, assign) unsigned int reconnectDelay; // in seconds (default is 1)
 @property (readwrite, assign) unsigned int reconnectDelayMax; // in seconds (default is 1)

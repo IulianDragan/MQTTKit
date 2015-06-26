@@ -628,7 +628,7 @@ int mosquitto_unsubscribe(struct mosquitto *mosq, int *mid, const char *sub)
 	return _mosquitto_send_unsubscribe(mosq, mid, sub);
 }
 
-int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *capath, const char *certfile, const char *keyfile, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
+int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *capath, const char *certfile, const char *keyfile, const char *keydata, int keylength, int (*pw_callback)(char *buf, int size, int rwflag, void *userdata))
 {
 #ifdef WITH_TLS
 	FILE *fptr;
@@ -713,6 +713,32 @@ int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *ca
 		if(mosq->tls_keyfile) _mosquitto_free(mosq->tls_keyfile);
 		mosq->tls_keyfile = NULL;
 	}
+    
+    if (keydata){
+        if (keylength <= 0) {
+            if(mosq->tls_cafile){
+                _mosquitto_free(mosq->tls_cafile);
+                mosq->tls_cafile = NULL;
+            }
+            if(mosq->tls_capath){
+                _mosquitto_free(mosq->tls_capath);
+                mosq->tls_capath = NULL;
+            }
+            if(mosq->tls_certfile){
+                _mosquitto_free(mosq->tls_certfile);
+                mosq->tls_certfile = NULL;
+            }
+            return MOSQ_ERR_INVAL;
+        }
+        mosq->tls_keydata = keydata;
+        mosq->tls_keylength = keylength;
+        if(!mosq->tls_keydata){
+            return MOSQ_ERR_NOMEM;
+        }
+    }else{
+        if(mosq->tls_keydata) _mosquitto_free(mosq->tls_keydata);
+        mosq->tls_keydata = NULL;
+    }
 
 	mosq->tls_pw_callback = pw_callback;
 
