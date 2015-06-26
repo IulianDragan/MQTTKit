@@ -633,7 +633,7 @@ int mosquitto_tls_set(struct mosquitto *mosq, const char *cafile, const char *ca
 #ifdef WITH_TLS
 	FILE *fptr;
 
-	if(!mosq || (!cafile && !capath) || (certfile && !keyfile) || (!certfile && keyfile)) return MOSQ_ERR_INVAL;
+	if(!mosq || (!cafile && !capath) || (certfile && (!keyfile && !keydata)) || (!certfile && (keyfile || keydata))) return MOSQ_ERR_INVAL;
 
 	if(cafile){
 		fptr = _mosquitto_fopen(cafile, "rt");
