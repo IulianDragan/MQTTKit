@@ -22,6 +22,13 @@ typedef enum MQTTQualityOfService : NSUInteger {
     ExactlyOnce
 } MQTTQualityOfService;
 
+typedef NS_ENUM(NSInteger, MQTTConnectionStatus) {
+    MQTTConnectionStatusDisconnected,
+    MQTTConnectionStatusConnecting,
+    MQTTConnectionStatusConnected,
+    MQTTConnectionStatusDisconnecting
+};
+
 #pragma mark - MQTT Message
 
 @interface MQTTMessage : NSObject
@@ -61,7 +68,7 @@ typedef void (^MQTTDisconnectionHandler)(NSUInteger code);
 @property (readwrite, assign) unsigned int reconnectDelayMax; // in seconds (default is 1)
 @property (readwrite, assign) BOOL reconnectExponentialBackoff; // wheter to backoff exponentially the reconnect attempts (default is NO)
 @property (readwrite, assign) BOOL cleanSession;
-@property (readonly, assign) BOOL connected;
+@property (nonatomic, assign, readonly) MQTTConnectionStatus connectionStatus;
 @property (nonatomic, copy) MQTTMessageHandler messageHandler;
 @property (nonatomic, copy) MQTTDisconnectionHandler disconnectionHandler;
 @property (nonatomic, copy) void (^logHandler)(NSString *logMessage);

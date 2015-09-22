@@ -57,7 +57,8 @@
 @property (nonatomic, strong) NSMutableDictionary *unsubscriptionHandlers;
 // dictionary of mid -> completion handlers for messages published with a QoS of 1 or 2
 @property (nonatomic, strong) NSMutableDictionary *publishHandlers;
-@property (nonatomic, assign) BOOL connected;
+
+@property (nonatomic, assign, readwrite) MQTTConnectionStatus connectionStatus;
 
 // dispatch queue to run the mosquitto_loop_forever.
 @property (nonatomic, strong) dispatch_queue_t queue;
@@ -78,11 +79,17 @@ static void on_log(struct mosquitto *mosq, void *obj, int level, const char *str
 
 static void on_connect(struct mosquitto *mosq, void *obj, int rc)
 {
+    // TODO: Quando recebermos on_connect, com status diferente de rc == ConnectionAccepted, qual o comportamento que devemos fazer? Esse cenário é possível?
+    
     MQTTClient* client = (__bridge MQTTClient*)obj;
     if (client.logHandler) {
         client.logHandler([NSString stringWithFormat:@"[%@] on_connect rc = %d", client.clientID, rc]);
     }
-    client.connected = (rc == ConnectionAccepted);
+    
+    if (rc == ConnectionAccepted) {
+        client.connectionStatus = MQTTConnectionStatusConnected;
+    }
+    
     if (client.connectionCompletionHandler) {
         client.connectionCompletionHandler(rc);
     }
@@ -100,11 +107,11 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
         [client.unsubscriptionHandlers removeAllObjects];
     }
     
-    client.connected = NO;
+    client.connectionStatus = MQTTConnectionStatusDisconnected;
+    
     if (client.disconnectionHandler) {
         client.disconnectionHandler(rc);
     }
-    
     
    	struct mosquitto_message_all *tmp = mosq->out_messages;
     while (tmp) {
@@ -247,6 +254,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
 #pragma mark - Connection
 
 - (void) connectWithCompletionHandler:(void (^)(MQTTConnectionReturnCode code))completionHandler {
+    self.connectionStatus = MQTTConnectionStatusConnecting;
     self.connectionCompletionHandler = completionHandler;
     
     const char *cstrHost = [self.host cStringUsingEncoding:NSASCIIStringEncoding];
@@ -296,6 +304,8 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
 }
 
 - (void) disconnectWithCompletionHandler:(MQTTDisconnectionHandler)completionHandler {
+    self.connectionStatus = MQTTConnectionStatusDisconnecting;
+    
     if (completionHandler) {
         self.disconnectionHandler = completionHandler;
     }
