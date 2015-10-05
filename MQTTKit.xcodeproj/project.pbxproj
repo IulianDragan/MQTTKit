@@ -32,6 +32,7 @@
 		93F20A97181A68AB00C34747 /* util_mosq.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F20A72181A68AB00C34747 /* util_mosq.c */; };
 		93F20A99181A68AB00C34747 /* will_mosq.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F20A75181A68AB00C34747 /* will_mosq.c */; };
 		AA32E4851BC2ED09001E6F54 /* openssl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA32E4841BC2ED09001E6F54 /* openssl.framework */; };
+		AA55A14D1BC30D0E00AEB331 /* MQTTCertificateHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = AA55A14C1BC30D0E00AEB331 /* MQTTCertificateHelper.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,8 @@
 		93F20A9B181A692F00C34747 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		93F20A9C181A76AF00C34747 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		AA32E4841BC2ED09001E6F54 /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = openssl.framework; path = "../potsdam-ios/SwiftDemo/Pods/MVLMQTTKit/openssl.framework"; sourceTree = "<group>"; };
+		AA55A14B1BC30D0E00AEB331 /* MQTTCertificateHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MQTTCertificateHelper.h; sourceTree = "<group>"; };
+		AA55A14C1BC30D0E00AEB331 /* MQTTCertificateHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MQTTCertificateHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -162,6 +165,8 @@
 		93EEBC9D1816CAB00055100D /* MQTTKit */ = {
 			isa = PBXGroup;
 			children = (
+				AA55A14B1BC30D0E00AEB331 /* MQTTCertificateHelper.h */,
+				AA55A14C1BC30D0E00AEB331 /* MQTTCertificateHelper.m */,
 				93EEBCA01816CAB00055100D /* MQTTKit.h */,
 				93EEBCA21816CAB00055100D /* MQTTKit.m */,
 				93EEBC9E1816CAB00055100D /* Supporting Files */,
@@ -321,6 +326,7 @@
 				93F20A95181A68AB00C34747 /* tls_mosq.c in Sources */,
 				93F20A99181A68AB00C34747 /* will_mosq.c in Sources */,
 				93F20A89181A68AB00C34747 /* read_handle_shared.c in Sources */,
+				AA55A14D1BC30D0E00AEB331 /* MQTTCertificateHelper.m in Sources */,
 				93F20A93181A68AB00C34747 /* time_mosq.c in Sources */,
 				93F20A82181A68AB00C34747 /* mosquitto.c in Sources */,
 				93F20A97181A68AB00C34747 /* util_mosq.c in Sources */,
