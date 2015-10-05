@@ -31,6 +31,7 @@
 		93F20A95181A68AB00C34747 /* tls_mosq.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F20A6F181A68AB00C34747 /* tls_mosq.c */; };
 		93F20A97181A68AB00C34747 /* util_mosq.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F20A72181A68AB00C34747 /* util_mosq.c */; };
 		93F20A99181A68AB00C34747 /* will_mosq.c in Sources */ = {isa = PBXBuildFile; fileRef = 93F20A75181A68AB00C34747 /* will_mosq.c */; };
+		AA32E4851BC2ED09001E6F54 /* openssl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA32E4841BC2ED09001E6F54 /* openssl.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,7 @@
 		93F20A76181A68AB00C34747 /* will_mosq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = will_mosq.h; sourceTree = "<group>"; };
 		93F20A9B181A692F00C34747 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		93F20A9C181A76AF00C34747 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		AA32E4841BC2ED09001E6F54 /* openssl.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = openssl.framework; path = "../potsdam-ios/SwiftDemo/Pods/MVLMQTTKit/openssl.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +109,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93EEBC9C1816CAB00055100D /* Foundation.framework in Frameworks */,
+				AA32E4851BC2ED09001E6F54 /* openssl.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,6 +151,7 @@
 		93EEBC9A1816CAB00055100D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA32E4841BC2ED09001E6F54 /* openssl.framework */,
 				93EEBC9B1816CAB00055100D /* Foundation.framework */,
 				93EEBCA91816CAB00055100D /* XCTest.framework */,
 				93EEBCAC1816CAB00055100D /* UIKit.framework */,

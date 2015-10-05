@@ -7,12 +7,18 @@ Pod::Spec.new do |s|
   s.author       = { "Jeff Mesnil" => "jmesnil@gmail.com" }
   s.ios.platform = :ios, '8.0'
   s.ios.deployment_target = "8.0"
-  s.source       = { :git => "https://github.com/Movile/MQTTKit.git", :tag => s.version.to_s }
+  s.source       = { :git => "./", :tag => s.version.to_s }
 
   s.source_files  = 'libmosquitto/*.{h,c}', 'MQTTKit/*.{h,m}'
   s.public_header_files = 'MQTTKit/MQTTKit.h'
   s.compiler_flags = '-DWITH_THREADING=1 -DWITH_TLS=1'
   s.requires_arc = true
-  
-  s.dependency 'OpenSSL-Universal', '1.0.1.j-2'
+
+  s.ios.vendored_frameworks = 'security/openssl.framework'
+  s.pod_target_xcconfig = {
+      'FRAMEWORK_SEARCH_PATHS' => "$(inherited) '${PODS_ROOT}/Headers/Public/MVLMQTTKit/openssl'",
+      'OTHER_CFLAGS' => "$(inherited) -isystem '${PODS_ROOT}/Headers/Public/MVLMQTTKit/openssl'",
+      'OTHER_LDFLAGS' => "$(inherited) -ObjC -framework 'openssl'"
+  }
+
 end
