@@ -5,8 +5,8 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/Movile/MQTTKit"
   s.license      = { :type => 'Apache License, Version 2.0', :file => 'LICENSE' }
   s.author       = { "Jeff Mesnil" => "jmesnil@gmail.com" }
-  s.ios.platform = :ios, '8.0'
-  s.ios.deployment_target = "8.0"
+  s.ios.platform = :ios, '7.0'
+  s.ios.deployment_target = "7.0"
   s.source       = { :git => "https://github.com/Movile/MQTTKit.git", :tag => s.version.to_s }
 
   s.source_files  = 'MQTTKit/*.{h,m}'
