@@ -231,7 +231,7 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_subscribe_callback_set(mosq, on_subscribe);
         mosquitto_unsubscribe_callback_set(mosq, on_unsubscribe);
         mosquitto_log_callback_set(mosq, on_log);
-//        mosquitto_threaded_set(mosq, true);
+        mosquitto_threaded_set(mosq, true);
         mosquitto_max_inflight_messages_set(mosq, 0);
         
         self.queue = dispatch_queue_create(cstrClientId, NULL);
@@ -280,17 +280,16 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, keyData, keylength, NULL);
     }
     
-//    dispatch_async(self.queue, ^{
-//        if (self.logHandler) {
-//            self.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", self.queue]);
-//        }
-//        mosquitto_loop_forever(mosq, -1, 1);
-//        if (self.logHandler) {
-//            self.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", self.queue]);
-//        }
-//    });
+    dispatch_async(self.queue, ^{
+        if (self.logHandler) {
+            self.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", self.queue]);
+        }
+        mosquitto_loop_forever(mosq, -1, 1);
+        if (self.logHandler) {
+            self.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", self.queue]);
+        }
+    });
     
-    mosquitto_loop_start(mosq);
     mosquitto_connect_async(mosq, cstrHost, self.port, self.keepAlive);
 }
 
@@ -311,7 +310,6 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         self.disconnectionHandler = completionHandler;
     }
     mosquitto_disconnect(mosq);
-    mosquitto_loop_stop(mosq, false);
 }
 
 - (void)setWillData:(NSData *)payload
