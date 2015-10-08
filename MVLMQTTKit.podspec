@@ -15,6 +15,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency 'Mosquitto' 
-  s.ios.vendored_frameworks = 'security/openssl.framework'
+  s.dependency 'MVLOpenSSL'
 
 end
