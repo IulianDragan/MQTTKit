@@ -8,9 +8,8 @@
 //
 
 #import "MQTTKit.h"
-#import "mosquitto.h"
-#import "mosquitto_internal.h"
-#import "messages_mosq.h"
+#include <mosquitto.h>
+#include <messages_mosq.h>
 
 #pragma mark - MQTT Message
 
@@ -101,11 +100,6 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
     if (client.logHandler) {
         client.logHandler([NSString stringWithFormat:@"[%@] on_disconnect rc = %d", client.clientID, rc]);
     }
-    if (rc == 0) {
-        [client.publishHandlers removeAllObjects];
-        [client.subscriptionHandlers removeAllObjects];
-        [client.unsubscriptionHandlers removeAllObjects];
-    }
     
     client.connectionStatus = MQTTConnectionStatusDisconnected;
     
@@ -113,17 +107,23 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
         client.disconnectionHandler(rc);
     }
     
-   	struct mosquitto_message_all *tmp = mosq->out_messages;
+    struct mosquitto_message_all *tmp = mosquitto_out_messages(mosq);
     while (tmp) {
         NSNumber *mid = @(tmp->msg.mid);
         void (^handler)(int, NSError *) = [client.publishHandlers objectForKey:mid];
         if (handler) {
             NSError *error = [NSError errorWithDomain:NSStringFromClass([MQTTClient class]) code:100 userInfo:nil];
             handler(tmp->msg.mid, error);
+            [client.publishHandlers removeObjectForKey:mid];
         }
         tmp = tmp->next;
     }
     _mosquitto_message_cleanup_all(mosq);
+    
+    if (rc == 0) {
+        [client.subscriptionHandlers removeAllObjects];
+        [client.unsubscriptionHandlers removeAllObjects];
+    }
 }
 
 static void on_publish(struct mosquitto *mosq, void *obj, int message_id)

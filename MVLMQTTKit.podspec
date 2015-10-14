@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "MVLMQTTKit"
-  s.version      = "0.5.1"
+  s.version      = "0.5.2"
   s.summary      = "Objective-C client for MQTT 3.1"
   s.homepage     = "https://github.com/Movile/MQTTKit"
   s.license      = { :type => 'Apache License, Version 2.0', :file => 'LICENSE' }
@@ -11,10 +11,14 @@ Pod::Spec.new do |s|
 
   s.source_files  = 'MQTTKit/*.{h,m}'
   s.public_header_files = 'MQTTKit/MQTTKit.h'
-  s.compiler_flags = '-DWITH_THREADING=1 -DWITH_TLS=1'
   s.requires_arc = true
 
   s.dependency 'Mosquitto' 
-  s.ios.vendored_frameworks = 'security/openssl.framework'
+  s.dependency 'MVLOpenSSL'
+  s.xcconfig = {
+    'HEADER_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/Headers/Private/Mosquitto/',
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/MVLOpenSSL/Pod',
+    'OTHER_LDFLAGS' => '$(inherited) -framework openssl'
+  }
 
 end
