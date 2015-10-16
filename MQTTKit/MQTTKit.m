@@ -284,13 +284,12 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         if (self.logHandler) {
             self.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", self.queue]);
         }
+        mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
         mosquitto_loop_forever(mosq, -1, 1);
         if (self.logHandler) {
             self.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", self.queue]);
         }
     });
-    
-    mosquitto_connect_async(mosq, cstrHost, self.port, self.keepAlive);
 }
 
 - (void)connectToHost:(NSString *)host
