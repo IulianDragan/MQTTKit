@@ -1,6 +1,12 @@
 source 'https://github.com/CocoaPods/Specs.git'
 source 'https://github.com/Movile/iOS-Specs.git'
 
-target 'MQTTExample' do
-    pod 'MVLMQTTKit', :path => '../'
-end
+#target 'MQTTExample', :exclusive => true do
+#    pod 'Mosquitto', :git => 'https://github.com/Movile/mosquitto-ios'
+#    pod 'MVLMQTTKit', :path => '../'
+#end
+
+pod 'Mosquitto', :git => 'https://github.com/Movile/mosquitto-ios'
+pod 'MVLMQTTKit', :path => '../'
+
+link_with 'MQTTExample', 'MQTTExampleTests'

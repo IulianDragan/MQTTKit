@@ -91,6 +91,7 @@ static void on_connect(struct mosquitto *mosq, void *obj, int rc)
     
     if (client.connectionCompletionHandler) {
         client.connectionCompletionHandler(rc);
+        client.connectionCompletionHandler = NULL;
     }
 }
 
@@ -280,14 +281,22 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_tls_set(mosq, caFile, NULL, certFile, keyFile, keyData, keylength, NULL);
     }
     
+    __weak typeof(self)weakSelf = self;
     dispatch_async(self.queue, ^{
-        if (self.logHandler) {
-            self.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", self.queue]);
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        if (strongSelf.logHandler) {
+            strongSelf.logHandler([NSString stringWithFormat:@"start mosquitto loop on %@", strongSelf.queue]);
         }
-        mosquitto_connect(mosq, cstrHost, self.port, self.keepAlive);
-        mosquitto_loop_forever(mosq, -1, 1);
-        if (self.logHandler) {
-            self.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", self.queue]);
+        mosquitto_connect(mosq, cstrHost, strongSelf.port, strongSelf.keepAlive);
+        int rc = mosquitto_loop_forever(mosq, -1, 1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (strongSelf.connectionCompletionHandler) {
+                strongSelf.connectionCompletionHandler(rc);
+                strongSelf.connectionCompletionHandler = NULL;
+            }
+        });
+        if (strongSelf.logHandler) {
+            strongSelf.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", strongSelf.queue]);
         }
     });
 }
