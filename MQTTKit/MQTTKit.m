@@ -173,7 +173,7 @@ static void on_subscribe(struct mosquitto *mosq, void *obj, int message_id, int 
         for (int i = 0; i < qos_count; i++) {
             [grantedQos addObject:[NSNumber numberWithInt:granted_qos[i]]];
         }
-        handler(grantedQos);
+        handler(grantedQos, nil);
         [client.subscriptionHandlers removeObjectForKey:mid];
     }
 }
@@ -389,7 +389,15 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
 {
     const char* cstrTopic = [topic cStringUsingEncoding:NSUTF8StringEncoding];
     int mid;
-    mosquitto_subscribe(mosq, &mid, cstrTopic, qos);
+    int rc = mosquitto_subscribe(mosq, &mid, cstrTopic, qos);
+    
+    if (rc != MOSQ_ERR_SUCCESS) {
+        if (completionHandler) {
+            completionHandler(nil, [NSError errorWithDomain:@"com.mvlmqttkit.subscribe.error" code:rc userInfo:nil]);
+        }
+        return;
+    }
+    
     if (completionHandler) {
         [self.subscriptionHandlers setObject:[completionHandler copy] forKey:[NSNumber numberWithInteger:mid]];
     }

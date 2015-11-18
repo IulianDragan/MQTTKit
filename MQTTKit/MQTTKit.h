@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, MQTTConnectionStatus) {
 
 @end
 
-typedef void (^MQTTSubscriptionCompletionHandler)(NSArray *grantedQos);
+typedef void (^MQTTSubscriptionCompletionHandler)(NSArray *grantedQos, NSError *error);
 typedef void (^MQTTMessageHandler)(MQTTMessage *message);
 typedef void (^MQTTDisconnectionHandler)(NSUInteger code);
 
