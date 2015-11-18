@@ -102,12 +102,6 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
         client.logHandler([NSString stringWithFormat:@"[%@] on_disconnect rc = %d", client.clientID, rc]);
     }
     
-    client.connectionStatus = MQTTConnectionStatusDisconnected;
-    
-    if (client.disconnectionHandler) {
-        client.disconnectionHandler(rc);
-    }
-    
     struct mosquitto_message_all *tmp = mosquitto_out_messages(mosq);
     while (tmp) {
         NSNumber *mid = @(tmp->msg.mid);
@@ -124,6 +118,12 @@ static void on_disconnect(struct mosquitto *mosq, void *obj, int rc)
     if (rc == 0) {
         [client.subscriptionHandlers removeAllObjects];
         [client.unsubscriptionHandlers removeAllObjects];
+    }
+    
+    client.connectionStatus = MQTTConnectionStatusDisconnected;
+    
+    if (client.disconnectionHandler) {
+        client.disconnectionHandler(rc);
     }
 }
 
