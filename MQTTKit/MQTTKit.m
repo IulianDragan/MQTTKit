@@ -91,7 +91,6 @@ static void on_connect(struct mosquitto *mosq, void *obj, int rc)
     
     if (client.connectionCompletionHandler) {
         client.connectionCompletionHandler(rc);
-        client.connectionCompletionHandler = NULL;
     }
 }
 
