@@ -15,4 +15,6 @@
 + (NSString *)retrieveCaPath;
 + (NSString *)retrieveCRTPathByUserID:(NSString *)userID;
 
++ (NSDate *)certificateExpiryDateFromCRTAtPath:(NSString *)CRTFilePath;
+
 @end
