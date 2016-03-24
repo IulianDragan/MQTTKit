@@ -279,7 +279,13 @@ static NSString *kBaseKeyIdentifier = @"com.potsdam";
 + (NSDate *)certificateExpiryDateFromCRTAtPath:(NSString *)CRTFilePath {
     
     FILE *fp = fopen([CRTFilePath cStringUsingEncoding:NSUTF8StringEncoding], "r");
+    
+    if (fp == NULL) {
+        return nil;
+    }
+    
     X509 *certificateX509 = PEM_read_X509(fp, NULL, NULL, NULL);
+    
     fclose(fp);
     
     NSDate *expiryDate = nil;
