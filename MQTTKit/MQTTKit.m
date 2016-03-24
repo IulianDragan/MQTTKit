@@ -290,6 +290,10 @@ static void on_unsubscribe(struct mosquitto *mosq, void *obj, int message_id)
         mosquitto_connect(mosq, cstrHost, strongSelf.port, strongSelf.keepAlive);
         int rc = mosquitto_loop_forever(mosq, -1, 1);
         
+        if (rc != 0 && completionHandler) {
+            completionHandler(rc);
+        }
+        
         if (strongSelf.logHandler) {
             strongSelf.logHandler([NSString stringWithFormat:@"end mosquitto loop on %@", strongSelf.queue]);
         }

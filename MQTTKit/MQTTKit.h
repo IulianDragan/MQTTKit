@@ -13,7 +13,8 @@ typedef enum MQTTConnectionReturnCode : NSUInteger {
     ConnectionRefusedIdentiferRejected,
     ConnectionRefusedServerUnavailable,
     ConnectionRefusedBadUserNameOrPassword,
-    ConnectionRefusedNotAuthorized
+    ConnectionRefusedNotAuthorized,
+    ConnectionTLSError = 8
 } MQTTConnectionReturnCode;
 
 typedef enum MQTTQualityOfService : NSUInteger {
