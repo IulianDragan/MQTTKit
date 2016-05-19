@@ -8,8 +8,8 @@
 //
 
 #import "MQTTKit.h"
-#include <mosquitto.h>
-#include <messages_mosq.h>
+#include "mosquitto.h"
+#include "messages_mosq.h"
 
 #pragma mark - MQTT Message
 
