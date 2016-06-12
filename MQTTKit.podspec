@@ -14,10 +14,10 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency 'Mosquitto' 
-  s.dependency 'MVLOpenSSL'
+  s.dependency 'OpenSSL'
   s.xcconfig = {
     'HEADER_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/Headers/Private/Mosquitto/',
-    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/MVLOpenSSL/Pod',
+    'FRAMEWORK_SEARCH_PATHS' => '$(inherited) $(PODS_ROOT)/OpenSSL/Pod',
     'OTHER_LDFLAGS' => '$(inherited) -framework openssl'
   }
 end
