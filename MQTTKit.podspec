@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = "MVLMQTTKit"
+  s.name         = "MQTTKit"
   s.version      = "0.6.4"
   s.summary      = "Objective-C client for MQTT 3.1"
   s.homepage     = "https://github.com/Movile/MQTTKit"
